@@ -42,7 +42,7 @@
           <button type="button" id="unlock" class="btn btn-lg btn-default">Unlock</button>
           <button type="button" id="lock" class="btn btn-lg btn-default">Lock</button>
         </p>
-	<div class="loading centered">
+	<div class="loading centered hidden">
 	  <img src="images/ajax-loader.gif">
 	  <p>Sending request to lock...</p>
         </div>
@@ -84,9 +84,9 @@
 
 <script>
 $(document).ready(function(){
-	var ip = "";
-	var initialStatus = getStatus(ip);
+	var ip = "http://localhost:8000";
 	var loading = $(".loading");
+	/*var initialStatus = getStatus(ip);
 	if(initialStatus == "UNLOCKED")
 	{
 		$("#unlock").removeClass("btn-default").addClass("btn-success");
@@ -98,7 +98,7 @@ $(document).ready(function(){
 	else
 	{
 		displayError("Unable to get status of your lock.");
-	}
+	} */
 
 	$("#unlock").click(function(){
 		if($("#unlock").hasClass("btn-default"))
@@ -126,38 +126,45 @@ $(document).ready(function(){
 	});
 
 function displayError(errorMsg) {
-	$(".alert").html("<p><span class=\"glyphicon error-icon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>" + errorMsg + "</p>").removeClass("hidden");
+	$(".alert").html("<p><span class=\"glyphicon error-icon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>" + errorMsg + "</p>").show();
+}
+function hideError() {
+	$(".alert").hide();
 }
 
 function lock(ip){
     var request = $.ajax({
-      url: ip + "/api/robots/smith/devices/lock/commands/close",
+      url: ip + "/api/robots/Smith/devices/lock/commands/set_angle",
+      data: JSON.stringify({ angle: 90 }),
+      contentType: "application/json",
       method: "POST"
     });
 
     request.done(function(msg) {
-      alert("Testing: " + msg);
+      hideError();
       return msg;
     });
 
     request.fail(function(jqXHR, msg) {
-      return msg;
+      displayError("Unable to get status of your lock.");
     });	 
 }
 
 function unlock() {
     var request = $.ajax({
-      url: ip + "/api/robots/smith/devices/lock/commands/open",
+      url: ip + "/api/robots/Smith/devices/lock/commands/set_angle",
+      data: JSON.stringify({ angle: 0 }),
+      contentType: "application/json",
       method: "POST"
     });
 
     request.done(function(msg) {
-      alert("Testing: " + msg);
+      hideError();
       return msg;
     });
 
     request.fail(function(jqXHR, msg) {
-      return msg;
+      displayError("Unable to get status of your lock.");
     });	 
 }
 
@@ -168,7 +175,6 @@ function getStatus() {
     });
 
     request.done(function(msg) {
-      alert("Testing: " + msg);
       return msg;
     });
 
