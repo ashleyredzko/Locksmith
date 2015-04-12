@@ -1,0 +1,24 @@
+.title-lock {
+  font-size: .8em;
+  margin-left: 3px;
+}
+.centered {
+  text-align: center;
+}
+.error-icon {
+  margin-right: 5px;
+}
+
+#unlock, #lock {
+min-width: 75px;
+width: 125px;
+}
+#unlock {
+border-bottom-right-radius: 0px;
+border-top-right-radius: 0px;
+}
+#lock {
+margin-left: -5px;
+border-bottom-left-radius: 0px;
+border-top-left-radius: 0px;
+}

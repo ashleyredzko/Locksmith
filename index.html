@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Locksmith</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="css/theme.css" rel="stylesheet">
+    <link href="css/scrolling-nav.css" rel="stylesheet">
+</head>
+ <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" role="document">
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header page-scroll">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-ex1-collapse" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand page-scroll" href="#page-top">Locksmith</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="hidden"><a class="page-scroll" href="#page-top"></a></li>
+            <li><a class="page-scroll" href="#about">About</a></li>
+            <li><a class="page-scroll" href="#hackathon">Hack UMass</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <section id="intro" class="intro-section">
+      <div class="alert alert-danger hidden" role="alert"></div> 
+      <div class="container">
+        <div class="page-header centered">
+          <h1>L<span class="title-lock glyphicon glyphicon-lock" aria-hidden="true"></span>cksmith</h1>
+        </div>
+	<p class="centered">
+          <button type="button" id="unlock" class="btn btn-lg btn-default">Unlock</button>
+          <button type="button" id="lock" class="btn btn-lg btn-default">Lock</button>
+        </p>
+	<div class="loading centered">
+	  <img src="images/ajax-loader.gif">
+	  <p>Sending request to lock...</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1>About Locksmith</h1>
+                </div>
+		<p>Locksmith is a web-api that works with the <a href="http://www.intel.com/content/www/us/en/do-it-yourself/edison.html" target="_blank">Intel Edison</a> using the web api from <a href="https://gunthercox.github.io/zorg" target="_blank">Zorg</a>. With a simple click of a button, you can use Locksmith to see if your door is locked, and lock or unlock it. 
+		</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="hackathon" class="services-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1>Hack Umass</h1>
+                </div>
+		<p>
+		This application is a project from <a href="http://hackumass.com/" target="_blank">Hack UMass</a>. Check out our <a href="http://challengepost.com/software/zorg" target="_blank">ChallengePost</a> project page!
+		</p>
+            </div>
+        </div>
+    </section>
+        <div class="panel-footer centered">
+		<p><span class="glyphicon glyphicon-copyright-mark" aria-hidden="true"></span> Copyright 2015</p>
+        </div>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.easing.min.js"></script>
+    <script src="js/scrolling-nav.js"></script>
+
+<script>
+$(document).ready(function(){
+	var ip = "";
+	var initialStatus = getStatus(ip);
+	var loading = $(".loading");
+	if(initialStatus == "UNLOCKED")
+	{
+		$("#unlock").removeClass("btn-default").addClass("btn-success");
+	}
+	else if(initialStatus == "LOCKED")
+	{
+		$("#lock").removeClass("btn-default").addClass("btn-danger");
+	}
+	else
+	{
+		displayError("Unable to get status of your lock.");
+	}
+
+	$("#unlock").click(function(){
+		if($("#unlock").hasClass("btn-default"))
+		{
+			$("#unlock").removeClass("btn-default").addClass("btn-success").html("Unlocked");
+			$("#lock").removeClass("btn-danger").addClass("btn-default").html("Lock");
+		unlock(ip);
+		}
+	});
+	$("#lock").click(function(){
+		if($("#lock").hasClass("btn-default"))
+		{
+			$("#lock").removeClass("btn-default").addClass("btn-danger").html("Locked");
+			$("#unlock").removeClass("btn-success").addClass("btn-default").html("Unlock");
+		lock(ip);
+		}
+	});
+
+	$(document).ajaxStart(function () {
+	    loading.show();
+	});
+
+	$(document).ajaxStop(function () {
+	    loading.hide();
+	});
+
+function displayError(errorMsg) {
+	$(".alert").html("<p><span class=\"glyphicon error-icon glyphicon-exclamation-sign\" aria-hidden=\"true\"></span><span class=\"sr-only\">Error:</span>" + errorMsg + "</p>").removeClass("hidden");
+}
+
+function lock(ip){
+    var request = $.ajax({
+      url: ip + "/api/robots/smith/devices/lock/commands/close",
+      method: "POST"
+    });
+
+    request.done(function(msg) {
+      alert("Testing: " + msg);
+      return msg;
+    });
+
+    request.fail(function(jqXHR, msg) {
+      return msg;
+    });	 
+}
+
+function unlock() {
+    var request = $.ajax({
+      url: ip + "/api/robots/smith/devices/lock/commands/open",
+      method: "POST"
+    });
+
+    request.done(function(msg) {
+      alert("Testing: " + msg);
+      return msg;
+    });
+
+    request.fail(function(jqXHR, msg) {
+      return msg;
+    });	 
+}
+
+function getStatus() {
+    var request = $.ajax({
+      url: ip + "/api/robots/smith/devices/lock/commands/status",
+      method: "POST"
+    });
+
+    request.done(function(msg) {
+      alert("Testing: " + msg);
+      return msg;
+    });
+
+    request.fail(function(jqXHR, msg) {
+      return msg;
+    });	 
+}
+});
+</script>
+</body>
+</html>
